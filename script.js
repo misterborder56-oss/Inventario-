@@ -1,14 +1,14 @@
 // ---------------- REGISTRAR COMPRA ----------------
-async function comprarProducto() {
+async function comprarProducto(){
 
-let nombre = document.getElementById("nombreProducto").value.trim().toLowerCase();
-let cantidad = Number(document.getElementById("cantidadCompra").value);
-let costo = Number(document.getElementById("costoCompra").value);
-let precioVenta = Number(document.getElementById("precioVenta").value);
+let nombre=document.getElementById("nombreProducto").value.trim().toLowerCase();
+let cantidad=Number(document.getElementById("cantidadCompra").value);
+let costo=Number(document.getElementById("costoCompra").value);
+let precioVenta=Number(document.getElementById("precioVenta").value);
 
-if(!nombre || cantidad<=0) return alert("Completa los datos");
+if(!nombre || cantidad<=0 || costo<=0) return alert("Datos incorrectos");
 
-let { data: prod } = await supabase
+let { data:prod } = await supabase
 .from("productos")
 .select("*")
 .eq("nombre", nombre)
@@ -35,6 +35,7 @@ await supabase
 .from("productos")
 .update({
 stock:prod.stock+cantidad,
+costo_promedio:costo,
 precio_venta:precioVenta
 })
 .eq("id", prod.id);
@@ -84,12 +85,11 @@ mostrarProductos();
 // ---------------- ELIMINAR ----------------
 async function eliminarProducto(id){
 if(!confirm("¿Eliminar producto?")) return;
-
 await supabase.from("productos").delete().eq("id",id);
 mostrarProductos();
 }
 
-// ---------------- MOSTRAR ----------------
+// ---------------- MOSTRAR PRODUCTOS ----------------
 async function mostrarProductos(){
 
 let { data:productos } = await supabase
@@ -103,7 +103,11 @@ lista.innerHTML="";
 let ingresoMes=0;
 let gastoMes=0;
 
+let filtro=document.getElementById("buscador").value.toLowerCase();
+
 for(let prod of productos){
+
+if(!prod.nombre.includes(filtro)) continue;
 
 let { data:movs } = await supabase
 .from("movimientos")
@@ -114,35 +118,45 @@ let ingreso=0;
 let gasto=0;
 
 movs.forEach(m=>{
+
 if(m.tipo==="venta"){
-ingreso+=m.cantidad*m.precio_venta;
-gasto+=m.cantidad*m.costo_unitario;
-}else{
-gasto+=m.cantidad*m.costo_unitario;
+ingreso += m.cantidad * m.precio_venta;
+gasto += m.cantidad * m.costo_unitario;
 }
+
+if(m.tipo==="compra"){
+gasto += m.cantidad * m.costo_unitario;
+}
+
 });
+
+let ganancia=ingreso-gasto;
+let margen= ingreso>0 ? ((ganancia/ingreso)*100).toFixed(2) : 0;
 
 ingresoMes+=ingreso;
 gastoMes+=gasto;
-
-let ganancia=ingreso-gasto;
 
 lista.innerHTML+=`
 <div class="producto">
 <b>${prod.nombre.toUpperCase()}</b><br>
 Stock: ${prod.stock}<br>
-Precio: $${prod.precio_venta}<br>
+Precio venta: $${prod.precio_venta}<br>
 Ingresos: $${ingreso.toFixed(2)}<br>
 Gastos: $${gasto.toFixed(2)}<br>
-Ganancia: $${ganancia.toFixed(2)}
+Ganancia: $${ganancia.toFixed(2)}<br>
+Margen: ${margen}% 
 <button class="btn-eliminar" onclick="eliminarProducto('${prod.id}')">Eliminar</button>
 </div>
 `;
 }
 
+let gananciaMes=ingresoMes-gastoMes;
+let margenMes= ingresoMes>0 ? ((gananciaMes/ingresoMes)*100).toFixed(2) : 0;
+
 document.getElementById("ingresoMes").textContent=ingresoMes.toFixed(2);
 document.getElementById("gastoMes").textContent=gastoMes.toFixed(2);
-document.getElementById("gananciaMes").textContent=(ingresoMes-gastoMes).toFixed(2);
+document.getElementById("gananciaMes").textContent=gananciaMes.toFixed(2);
+document.getElementById("margenMes").textContent=margenMes+"%";
 }
 
 document.getElementById("buscador").addEventListener("input",mostrarProductos);
