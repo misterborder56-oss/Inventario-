@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Supermercado</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a34a">
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseUrl = "https://qyawdujqnzutfzwipfgo.supabase.co";
+const supabaseKey = "sb_publishable_P2IaYj-U-pLMbyKBkBzLLA_ed9Fyc9p";
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+window.supabase = supabaseClient;
+</script>
+</head>
+
+<body>
+
+<header>
+<h1>🛒 Sistema de Inventario</h1>
+</header>
+
+<div class="container">
+
+<!-- BUSCADOR -->
+<div class="card">
+<h2>Buscar</h2>
+<input type="text" id="buscador" placeholder="Buscar producto...">
+</div>
+
+<!-- COMPRA -->
+<div class="card">
+<h2>Registrar Compra</h2>
+<input type="text" id="nombreProducto" placeholder="Nombre producto">
+<input type="number" id="cantidadCompra" placeholder="Cantidad">
+<input type="number" id="costoCompra" placeholder="Costo por unidad">
+<input type="number" id="precioVenta" placeholder="Precio venta">
+<button onclick="comprarProducto()">Guardar Compra</button>
+</div>
+
+<!-- VENTA -->
+<div class="card">
+<h2>Registrar Venta</h2>
+<input type="text" id="productoVenta" placeholder="Nombre producto">
+<input type="number" id="cantidadVenta" placeholder="Cantidad vendida">
+<button onclick="venderProducto()">Registrar Venta</button>
+</div>
+
+<!-- RESUMEN -->
+<div class="card resumen">
+<h2>Resumen Mensual</h2>
+<p>Ingresos: $<span id="ingresoMes">0.00</span></p>
+<p>Gastos: $<span id="gastoMes">0.00</span></p>
+<p>Ganancia: $<span id="gananciaMes">0.00</span></p>
+</div>
+
+<!-- PRODUCTOS -->
+<div class="card">
+<h2>Productos</h2>
+<div id="listaProductos" class="grid"></div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
