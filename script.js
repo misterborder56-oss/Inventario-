@@ -101,7 +101,8 @@ let lista=document.getElementById("listaProductos");
 lista.innerHTML="";
 
 let ingresoMes=0;
-let gastoMes=0;
+let costoVendidoMes=0;
+let inventarioInvertidoMes=0;
 
 let filtro=document.getElementById("buscador").value.toLowerCase();
 
@@ -115,26 +116,34 @@ let { data:movs } = await supabase
 .eq("producto_id", prod.id);
 
 let ingreso=0;
-let gasto=0;
+let costoVendido=0;
+let totalComprado=0;
 
+// recorrer movimientos
 movs.forEach(m=>{
 
 if(m.tipo==="venta"){
 ingreso += m.cantidad * m.precio_venta;
-gasto += m.cantidad * m.costo_unitario;
+costoVendido += m.cantidad * m.costo_unitario;
 }
 
 if(m.tipo==="compra"){
-gasto += m.cantidad * m.costo_unitario;
+totalComprado += m.cantidad * m.costo_unitario;
 }
 
 });
 
-let ganancia=ingreso-gasto;
+// Inventario invertido = lo comprado - lo ya vendido
+let inventarioInvertido = totalComprado - costoVendido;
+
+let gastoTotalProducto = costoVendido + inventarioInvertido;
+
+let ganancia=ingreso-costoVendido;
 let margen= ingreso>0 ? ((ganancia/ingreso)*100).toFixed(2) : 0;
 
 ingresoMes+=ingreso;
-gastoMes+=gasto;
+costoVendidoMes+=costoVendido;
+inventarioInvertidoMes+=inventarioInvertido;
 
 lista.innerHTML+=`
 <div class="producto">
@@ -142,23 +151,23 @@ lista.innerHTML+=`
 Stock: ${prod.stock}<br>
 Precio venta: $${prod.precio_venta}<br>
 Ingresos: $${ingreso.toFixed(2)}<br>
-Gastos: $${gasto.toFixed(2)}<br>
-Ganancia: $${ganancia.toFixed(2)}<br>
+Costo vendido: $${costoVendido.toFixed(2)}<br>
+Inventario invertido: $${inventarioInvertido.toFixed(2)}<br>
+Gasto total invertido: $${gastoTotalProducto.toFixed(2)}<br>
+Ganancia real: $${ganancia.toFixed(2)}<br>
 Margen: ${margen}% 
 <button class="btn-eliminar" onclick="eliminarProducto('${prod.id}')">Eliminar</button>
 </div>
 `;
 }
 
-let gananciaMes=ingresoMes-gastoMes;
+let gastoTotalMes = costoVendidoMes + inventarioInvertidoMes;
+let gananciaMes=ingresoMes-costoVendidoMes;
 let margenMes= ingresoMes>0 ? ((gananciaMes/ingresoMes)*100).toFixed(2) : 0;
 
 document.getElementById("ingresoMes").textContent=ingresoMes.toFixed(2);
-document.getElementById("gastoMes").textContent=gastoMes.toFixed(2);
+document.getElementById("gastoMes").textContent=gastoTotalMes.toFixed(2);
 document.getElementById("gananciaMes").textContent=gananciaMes.toFixed(2);
 document.getElementById("margenMes").textContent=margenMes+"%";
 }
-
-document.getElementById("buscador").addEventListener("input",mostrarProductos);
-
 mostrarProductos();
