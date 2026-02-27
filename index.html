@@ -7,10 +7,6 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#16a34a">
-
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -31,7 +27,7 @@ window.supabase = supabaseClient;
 
 <!-- BUSCADOR -->
 <div class="card">
-<h2>Buscar</h2>
+<h2>Buscar Producto</h2>
 <input type="text" id="buscador" placeholder="Buscar producto...">
 </div>
 
@@ -41,7 +37,7 @@ window.supabase = supabaseClient;
 <input type="text" id="nombreProducto" placeholder="Nombre producto">
 <input type="number" id="cantidadCompra" placeholder="Cantidad">
 <input type="number" id="costoCompra" placeholder="Costo por unidad">
-<input type="number" id="precioVenta" placeholder="Precio venta">
+<input type="number" id="precioVenta" placeholder="Precio venta por unidad">
 <button onclick="comprarProducto()">Guardar Compra</button>
 </div>
 
@@ -55,10 +51,11 @@ window.supabase = supabaseClient;
 
 <!-- RESUMEN -->
 <div class="card resumen">
-<h2>Resumen Mensual</h2>
-<p>Ingresos: $<span id="ingresoMes">0.00</span></p>
-<p>Gastos: $<span id="gastoMes">0.00</span></p>
-<p>Ganancia: $<span id="gananciaMes">0.00</span></p>
+<h2>Resumen del Mes</h2>
+<p>💵 Ingresos: $<span id="ingresoMes">0.00</span></p>
+<p>💸 Gastos: $<span id="gastoMes">0.00</span></p>
+<p>📈 Ganancia: $<span id="gananciaMes">0.00</span></p>
+<p>📊 Margen: <span id="margenMes">0%</span></p>
 </div>
 
 <!-- PRODUCTOS -->
@@ -72,4 +69,4 @@ window.supabase = supabaseClient;
 <script src="script.js"></script>
 
 </body>
-</html>
+  </html>
